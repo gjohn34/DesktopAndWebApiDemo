@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using RetailDesktop.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,12 @@ namespace RetailDesktop.ViewModels
     {
         string _userName;
         string _password;
+        private IAPIHelper _apiHelper;
+
+        public LoginViewModel(IAPIHelper apiHelper)
+        {
+            _apiHelper = apiHelper;
+        }
 
         public string UserName
         {
@@ -49,13 +56,17 @@ namespace RetailDesktop.ViewModels
                 return output;
 
             }
-
-            // Why doesn't this work?
         }
 
-        public void LogIn()
+        public async Task LogIn()
         {
-                bool t = true;
-        }
+            try
+            {
+                var response = await _apiHelper.Authenticate(UserName, Password);
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }   
     }
 }
