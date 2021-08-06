@@ -14,12 +14,12 @@ namespace RetailManager.Controllers
     {
 
         // GET: api/User/
-        public List<UserModel> GetById()
+        public UserModel GetById()
         {
             string userId = RequestContext.Principal.Identity.GetUserId();
 
             UserData sql = new UserData();
-            List<UserModel> user = sql.GetUserById(userId);
+            UserModel user = sql.GetUserById(userId);
             return user;
         }
     }
