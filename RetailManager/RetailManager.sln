@@ -9,6 +9,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "RetailDatabase", "RetailDat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetailDesktop", "RetailDesktop\RetailDesktop.csproj", "{BC6782FF-8B00-43A3-B6A0-EAD6D5434B63}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetailManager.Library", "RetailManager.Library\RetailManager.Library.csproj", "{108723F5-A68C-47A2-B781-3D0E8B05B754}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{BC6782FF-8B00-43A3-B6A0-EAD6D5434B63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC6782FF-8B00-43A3-B6A0-EAD6D5434B63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC6782FF-8B00-43A3-B6A0-EAD6D5434B63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{108723F5-A68C-47A2-B781-3D0E8B05B754}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{108723F5-A68C-47A2-B781-3D0E8B05B754}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{108723F5-A68C-47A2-B781-3D0E8B05B754}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{108723F5-A68C-47A2-B781-3D0E8B05B754}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,6 +9,7 @@ using System.Web.Http;
 namespace RetailManager.Controllers
 {
     [Authorize]
+    [RoutePrefix("api/User")]
     public class ValuesController : ApiController
     {
         // GET api/values

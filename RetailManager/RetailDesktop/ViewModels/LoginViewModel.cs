@@ -43,6 +43,26 @@ namespace RetailDesktop.ViewModels
         }
 
 
+        public bool IsErrorVisible
+        {
+            get { return !string.IsNullOrEmpty(ErrorMessage); }
+        }
+
+        private string _errorMessage;
+
+        public string ErrorMessage
+        {
+            get { return _errorMessage; }
+            set { 
+                _errorMessage = value;
+                NotifyOfPropertyChange(() => ErrorMessage);
+                NotifyOfPropertyChange(() => IsErrorVisible);
+
+            }
+        }
+
+
+
         public bool CanLogIn
         {
             get
@@ -60,13 +80,19 @@ namespace RetailDesktop.ViewModels
 
         public async Task LogIn()
         {
+            ErrorMessage = "Sending...";
             try
             {
                 var response = await _apiHelper.Authenticate(UserName, Password);
+
+                // if response.token
+                // api call to /getUser
+                // save currentUser to state
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                ErrorMessage = ex.Message;
             }
-        }   
+        }
+
     }
 }
