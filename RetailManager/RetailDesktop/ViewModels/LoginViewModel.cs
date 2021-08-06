@@ -1,5 +1,5 @@
 ﻿using Caliburn.Micro;
-using RetailDesktop.Helpers;
+using RetailDesktop.Library.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,7 @@ namespace RetailDesktop.ViewModels
     {
         string _userName;
         string _password;
+        private string _errorMessage;
         private IAPIHelper _apiHelper;
 
         public LoginViewModel(IAPIHelper apiHelper)
@@ -48,7 +49,6 @@ namespace RetailDesktop.ViewModels
             get { return !string.IsNullOrEmpty(ErrorMessage); }
         }
 
-        private string _errorMessage;
 
         public string ErrorMessage
         {
@@ -84,10 +84,11 @@ namespace RetailDesktop.ViewModels
             try
             {
                 var response = await _apiHelper.Authenticate(UserName, Password);
-
-                // if response.token
-                // api call to /getUser
-                // save currentUser to state
+                if (!string.IsNullOrEmpty(response.Access_Token))
+                {
+                    await _apiHelper.GetLoggedInUserInfo(response.Access_Token);
+                    ErrorMessage = "";
+                }
             } catch (Exception ex)
             {
                 ErrorMessage = ex.Message;

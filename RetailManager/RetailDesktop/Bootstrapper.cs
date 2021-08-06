@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using RetailDesktop.Helpers;
+using RetailDesktop.Library.Helpers;
 using RetailDesktop.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using RetailDesktop.Library.Models;
 
 namespace RetailDesktop
 {
@@ -30,7 +32,8 @@ namespace RetailDesktop
             _container
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
-                .Singleton<IAPIHelper, APIHelper>();
+                .Singleton<IAPIHelper, APIHelper>()
+                .Singleton<ILoggedInUserModel, LoggedInUserModel>();
 
             GetType().Assembly.GetTypes()
                 .Where(type => type.IsClass)
