@@ -10,14 +10,14 @@ namespace RetailManager.Library.DataAccess
 {
     public class UserData
     {
-        public List<UserModel> GetUserById(string Id)
+        public UserModel GetUserById(string Id)
         {
             SqlDataAccess sql = new SqlDataAccess();
 
             // Anonymous object, no declared Type
             var p = new { Id };
 
-            return sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", p, "RetailManager");
+            return sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", p, "RetailManager").First();
                 
         }
         //public void CreateUser(string data) { }
