@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace RetailDesktop.ViewModels
 {
-    public class LoginViewModel : PropertyChangedBase
+    public class LoginViewModel : Screen
     {
         string _userName;
         string _password;
