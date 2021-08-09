@@ -12,6 +12,17 @@ namespace RetailDesktop.ViewModels
     {
         private BindingList<string> _products;
         private BindingList<string> _cart;
+        public BindingList<string> Products
+        {
+            get { return _products; }
+            set { Products = value; }
+        }
+        public BindingList<string> Cart
+        {
+            get { return _cart; }
+            set { Cart = value; }
+        }
+
         private int _quantity;
         public int Quantity
         {
