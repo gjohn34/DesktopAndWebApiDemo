@@ -10,7 +10,7 @@ namespace RetailDesktop.Library.Helpers
 {
     public class APIHelper : IAPIHelper
     {
-        private HttpClient apiClient;
+        private HttpClient _apiClient;
         private ILoggedInUserModel _loggedInUserModel;
 
         public APIHelper(ILoggedInUserModel loggedInUserModel)
@@ -18,12 +18,20 @@ namespace RetailDesktop.Library.Helpers
             InitializeClient();
             _loggedInUserModel = loggedInUserModel;
         }
+
+        public HttpClient ApiClient
+        {
+            get
+            {
+                return _apiClient;
+            }
+        }
         private void InitializeClient()
         {
-            apiClient = new HttpClient();
-            apiClient.BaseAddress = new Uri(ConfigurationManager.AppSettings["api"]);
-            apiClient.DefaultRequestHeaders.Accept.Clear();
-            apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _apiClient = new HttpClient();
+            _apiClient.BaseAddress = new Uri(ConfigurationManager.AppSettings["api"]);
+            _apiClient.DefaultRequestHeaders.Accept.Clear();
+            _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public async Task<AuthenticatedUser> Authenticate(string username, string password)
@@ -34,7 +42,7 @@ namespace RetailDesktop.Library.Helpers
                 new KeyValuePair<string, string>("username", username),
                 new KeyValuePair<string, string>("password", password)
             });
-            using (HttpResponseMessage response = await apiClient.PostAsync("/token", data))
+            using (HttpResponseMessage response = await _apiClient.PostAsync("/token", data))
             {
                 if (response.IsSuccessStatusCode)
                 {
@@ -49,11 +57,12 @@ namespace RetailDesktop.Library.Helpers
         }
         public async Task GetLoggedInUserInfo(string token)
         {
-            apiClient.DefaultRequestHeaders.Accept.Clear();
-            apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            _apiClient.DefaultRequestHeaders.Accept.Clear();
+            _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _apiClient.DefaultRequestHeaders.Accept.Clear();
+            _apiClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            using (HttpResponseMessage response = await apiClient.GetAsync("User"))
+            using (HttpResponseMessage response = await _apiClient.GetAsync("User"))
             {
                 if (response.IsSuccessStatusCode)
                 {
@@ -70,7 +79,6 @@ namespace RetailDesktop.Library.Helpers
                     throw new Exception(response.ReasonPhrase);
                 }
             }
-
         }
     }
 }

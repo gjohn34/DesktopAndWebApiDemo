@@ -1,4 +1,6 @@
 ﻿using Caliburn.Micro;
+using RetailDesktop.Library.Api;
+using RetailDesktop.Library.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,20 +12,29 @@ namespace RetailDesktop.ViewModels
 {
     public class SalesViewModel : Screen
     {
-        private BindingList<string> _products;
-        private BindingList<string> _cart;
-        public BindingList<string> Products
+        private BindingList<ProductModel> _products;
+        private BindingList<ProductModel> _cart;
+        private int _quantity;
+        private IProductEndpoint _productEndpoint;
+        public SalesViewModel(IProductEndpoint productEndpoint)
+        {
+            _productEndpoint = productEndpoint;
+        }
+        private async Task LoadProducts()
+        {
+            var products = await _productEndpoint.GetAll();
+            Products = new BindingList<ProductModel>(products);
+        }
+        public BindingList<ProductModel> Products
         {
             get { return _products; }
-            set { Products = value; }
+            set { _products = value; NotifyOfPropertyChange(() => Products); }
         }
-        public BindingList<string> Cart
+        public BindingList<ProductModel> Cart
         {
             get { return _cart; }
-            set { Cart = value; }
+            set { _cart = value; }
         }
-
-        private int _quantity;
         public int Quantity
         {
             get { return _quantity; }
@@ -54,7 +65,6 @@ namespace RetailDesktop.ViewModels
                 return output;
             }
         }
-
         public bool CanRemoveFromCart
         {
             get
@@ -67,7 +77,6 @@ namespace RetailDesktop.ViewModels
                 return output;
             }
         }
-
         public bool CanCheckOut
         {
             get
@@ -83,32 +92,23 @@ namespace RetailDesktop.ViewModels
         }
 
         // Events
-
         public void AddToCart()
         {
             throw new NotImplementedException();
         }
-
         public void RemoveFromCart()
         {
             throw new NotImplementedException();
         }
-
         public void Checkout()
         {
             throw new NotImplementedException();
         }
 
-
-        //public BindingList<string> Products
-        //{
-        //    get { return _products; }
-        //    set { _products = value; NotifyOfPropertyChange(() => Products);}
-        //}
-
-
-
-
-
+        protected override async void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+            await LoadProducts();
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace RetailDesktop.ViewModels
 
         public string UserName
         {
-            get { return _userName; }
+            get { return "foo@bar.com"; }
             set
             {
                 _userName = value;
@@ -37,7 +37,7 @@ namespace RetailDesktop.ViewModels
         }
         public string Password
         {
-            get { return _password; }
+            get { return "Password1!"; }
             set
             {
                 _password = value;

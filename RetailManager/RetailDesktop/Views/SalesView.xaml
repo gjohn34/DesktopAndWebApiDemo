@@ -33,11 +33,18 @@
             Grid.RowSpan="3" TextAlignment="Center"/>
         <!-- Items -->
         <TextBlock 
-            Panel.ZIndex="1" Text="Items:" 
+            Panel.ZIndex="1"
             Grid.Row="1" Grid.Column="0" />
         <ListBox 
+            ItemsSource="{Binding Products}" 
             x:Name="Products" Grid.Row="1" Grid.Column="0"
-            MinHeight="100" MinWidth="200" />
+            MinHeight="100" MinWidth="200">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <!-- Options -->
         <StackPanel 

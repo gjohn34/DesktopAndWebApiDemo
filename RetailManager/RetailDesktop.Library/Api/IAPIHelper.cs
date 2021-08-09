@@ -1,4 +1,5 @@
 ﻿using RetailDesktop.Library.Models;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace RetailDesktop.Library.Helpers
@@ -7,5 +8,6 @@ namespace RetailDesktop.Library.Helpers
     {
         Task<AuthenticatedUser> Authenticate(string username, string password);
         Task GetLoggedInUserInfo(string token);
+        HttpClient ApiClient { get; }
     }
 }

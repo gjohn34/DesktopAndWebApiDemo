@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using RetailDesktop.Library.Models;
+using RetailDesktop.Library.Api;
 
 namespace RetailDesktop
 {
@@ -28,7 +29,11 @@ namespace RetailDesktop
 
         protected override void Configure()
         {
-            _container.Instance(_container);
+            _container
+                .Instance(_container)
+                .PerRequest<IProductEndpoint, ProductEndpoint>();
+
+
             _container
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()

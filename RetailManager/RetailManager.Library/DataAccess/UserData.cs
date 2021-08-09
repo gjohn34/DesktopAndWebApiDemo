@@ -20,6 +20,5 @@ namespace RetailManager.Library.DataAccess
             return sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", p, "RetailManager").First();
                 
         }
-        //public void CreateUser(string data) { }
     } 
 }
