@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using RetailDesktop.EventModels;
 using RetailDesktop.Library.Helpers;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,12 @@ namespace RetailDesktop.ViewModels
         string _password;
         private string _errorMessage;
         private IAPIHelper _apiHelper;
+        private IEventAggregator _events;
 
-        public LoginViewModel(IAPIHelper apiHelper)
+        public LoginViewModel(IAPIHelper apiHelper, IEventAggregator events)
         {
             _apiHelper = apiHelper;
+            _events = events;
         }
 
         public string UserName
@@ -87,7 +90,8 @@ namespace RetailDesktop.ViewModels
                 if (!string.IsNullOrEmpty(response.Access_Token))
                 {
                     await _apiHelper.GetLoggedInUserInfo(response.Access_Token);
-                    ErrorMessage = "";
+                    ErrorMessage = "Login Successful";
+                    await _events.PublishOnUIThreadAsync(new LogOnEvent());
                 }
             } catch (Exception ex)
             {
