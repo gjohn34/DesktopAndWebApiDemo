@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using RetailDesktop.Library.Api;
+using RetailDesktop.Library.Helpers;
 using RetailDesktop.Library.Models;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,17 @@ namespace RetailDesktop.ViewModels
         private BindingList<ProductModel> _products;
         private BindingList<CartItemModel> _cart;
         private int _quantity = 1;
-        private IProductEndpoint _productEndpoint;
         private ProductModel _selectedProduct;
         private CartItemModel _selectedRemove;
+        IProductEndpoint _productEndpoint;
+        IConfigHelper _configHelper;
+        
+        // Constructors
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
+        {
+            _productEndpoint = productEndpoint;
+            _configHelper = configHelper;
+        }
 
         // Props
         public CartItemModel SelectedRemove
@@ -41,10 +50,6 @@ namespace RetailDesktop.ViewModels
                 NotifyOfPropertyChange(() => CanAddToCart);
                 }
         }
-        public SalesViewModel(IProductEndpoint productEndpoint)
-        {
-            _productEndpoint = productEndpoint;
-        }
         public BindingList<ProductModel> Products
         {
             get { return _products; }
@@ -53,7 +58,7 @@ namespace RetailDesktop.ViewModels
         public BindingList<CartItemModel> Cart
         {
             get { return _cart; }
-            set { _cart = value; NotifyOfPropertyChange(() => Cart); }
+            set { _cart = value; }
         }
         public int Quantity
         {
@@ -67,27 +72,22 @@ namespace RetailDesktop.ViewModels
         {
             get
             {
-                decimal subTotal = 0;
 
-                if (Cart != null)
-                {
-                    foreach (CartItemModel item in Cart)
-                    {
-                        subTotal += (item.Product.RetailPrice * item.QuantityInCart);
-                    }
-                }
-
-                return subTotal.ToString("C");
+                return CalculateSubTotal().ToString("C");
 
             }
         }
         public string Tax
         {
-            get { return "$0.00"; }
+            get
+            {
+
+                return CalculateTax().ToString("C");
+            }
         }
         public string Total
         {
-            get { return "$0.00"; }
+            get { return (CalculateSubTotal() + CalculateTax()).ToString("C"); }
 
         }
         public bool CanCheckOut
@@ -109,6 +109,36 @@ namespace RetailDesktop.ViewModels
             var products = await _productEndpoint.GetAll();
             Products = new BindingList<ProductModel>(products);
         }
+        private decimal CalculateSubTotal()
+        {
+            decimal subTotal = 0;
+
+            if (Cart != null)
+            {
+                foreach (CartItemModel item in Cart)
+                {
+                    subTotal += (item.Product.RetailPrice * item.QuantityInCart);
+                }
+            }
+            return subTotal;
+        }
+        private decimal CalculateTax()
+        {
+            decimal tax = 0;
+            decimal taxRate = _configHelper.GetTaxRate()/100;
+            if (Cart != null)
+            {
+                foreach (CartItemModel item in Cart)
+                {
+                    if (item.Product.IsTaxable)
+                    {
+                        tax += ((item.Product.RetailPrice * item.QuantityInCart) * taxRate);
+                    }
+                }
+            }
+            return tax;
+        }
+
         // Events   
         public void AddToCart()
         {
@@ -132,6 +162,8 @@ namespace RetailDesktop.ViewModels
             }
             Quantity = 1;
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => Cart);
         }
         public void RemoveFromCart()
@@ -146,6 +178,10 @@ namespace RetailDesktop.ViewModels
             Cart.Remove(SelectedRemove);
             SelectedRemove = Cart.FirstOrDefault();
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => Cart);
+
         }
         public void Checkout()
         {
