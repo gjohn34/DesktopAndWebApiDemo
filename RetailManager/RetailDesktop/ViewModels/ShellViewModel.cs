@@ -22,7 +22,7 @@ namespace RetailDesktop.ViewModels
             _container = container;
 
             // 'restarts' the login view to wipe data
-            ActivateItemAsync(_container.GetInstance<LoginViewModel>());
+            ActivateItemAsync(IoC.Get<LoginViewModel>());
 
         }
 
