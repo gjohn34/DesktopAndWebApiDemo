@@ -19,8 +19,9 @@ namespace RetailDesktop.ViewModels
         private int _quantity = 1;
         private ProductModel _selectedProduct;
         private CartItemModel _selectedRemove;
-        IProductEndpoint _productEndpoint;
-        IConfigHelper _configHelper;
+        readonly IProductEndpoint _productEndpoint;
+        readonly ISaleEndpoint _saleEndpoint;
+        readonly IConfigHelper _configHelper;
         
         // Constructors
         public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
@@ -87,19 +88,6 @@ namespace RetailDesktop.ViewModels
             get { return (CalculateSubTotal() + CalculateTax()).ToString("C"); }
 
         }
-        public bool CanCheckOut
-        {
-            get
-            {
-                bool output = false;
-                if (true) // Cart.Length > 0 ??
-                {
-                    output = true;
-                }
-                return output;
-            }
-
-        }
         // functions
         private async Task LoadProducts()
         {
@@ -162,6 +150,7 @@ namespace RetailDesktop.ViewModels
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => Cart);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
         public void RemoveFromCart()
         {
@@ -178,14 +167,28 @@ namespace RetailDesktop.ViewModels
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => Cart);
-
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
-        public void Checkout()
+        public void CheckOut()
         {
-            throw new NotImplementedException();
+            SaleModel sale = new SaleModel();
+
+            foreach (CartItemModel item in Cart)
+            {
+                sale.SaleDetails.Add(new SaleDetailModel(item.Product.Id, item.QuantityInCart));
+            }
+            _saleEndpoint.PostSale(sale);
+            // SaleModel 
+            // post to api
+            //throw new NotImplementedException();
         }
 
         // Listeners
+        public bool CanCheckOut
+        {
+            get { return Cart.Count > 0; }
+
+        }
         public bool CanAddToCart
         {
             get
@@ -220,7 +223,6 @@ namespace RetailDesktop.ViewModels
                 return false;
             }
         }
-
         protected override async void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
