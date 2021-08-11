@@ -72,16 +72,13 @@ namespace RetailDesktop.ViewModels
         {
             get
             {
-
                 return CalculateSubTotal().ToString("C");
-
             }
         }
         public string Tax
         {
             get
             {
-
                 return CalculateTax().ToString("C");
             }
         }
@@ -125,7 +122,7 @@ namespace RetailDesktop.ViewModels
         private decimal CalculateTax()
         {
             decimal tax = 0;
-            decimal taxRate = _configHelper.GetTaxRate()/100;
+            decimal taxRate = _configHelper.GetTaxRate() / 100;
             if (Cart != null)
             {
                 foreach (CartItemModel item in Cart)
