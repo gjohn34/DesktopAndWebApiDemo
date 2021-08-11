@@ -17,7 +17,6 @@ namespace RetailManager.Library.DataAccess
             // TODO - add overflow to loaddata to accept no p
             return sql.LoadData<ProductModel, dynamic>
                 ("dbo.spGetAllProducts", new { }, "RetailManager");
-
         }
     }
 }

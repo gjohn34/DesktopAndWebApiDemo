@@ -12,37 +12,74 @@ namespace RetailDesktop.ViewModels
 {
     public class SalesViewModel : Screen
     {
+        // Backers
         private BindingList<ProductModel> _products;
-        private BindingList<ProductModel> _cart;
-        private int _quantity;
+        private BindingList<CartItemModel> _cart;
+        private int _quantity = 1;
         private IProductEndpoint _productEndpoint;
+        private ProductModel _selectedProduct;
+        private CartItemModel _selectedRemove;
+
+        // Props
+        public CartItemModel SelectedRemove
+        {
+            get { return _selectedRemove; }
+            set {
+                _selectedRemove = value;
+                NotifyOfPropertyChange(() => SelectedRemove);
+                NotifyOfPropertyChange(() => CanRemoveFromCart);
+                }
+        }
+        public ProductModel SelectedProduct
+        {
+            get { return _selectedProduct; }
+            set { 
+                _selectedProduct = value;
+                Quantity = 1;
+                NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => Quantity);
+                NotifyOfPropertyChange(() => CanAddToCart);
+                }
+        }
         public SalesViewModel(IProductEndpoint productEndpoint)
         {
             _productEndpoint = productEndpoint;
-        }
-        private async Task LoadProducts()
-        {
-            var products = await _productEndpoint.GetAll();
-            Products = new BindingList<ProductModel>(products);
         }
         public BindingList<ProductModel> Products
         {
             get { return _products; }
             set { _products = value; NotifyOfPropertyChange(() => Products); }
         }
-        public BindingList<ProductModel> Cart
+        public BindingList<CartItemModel> Cart
         {
             get { return _cart; }
-            set { _cart = value; }
+            set { _cart = value; NotifyOfPropertyChange(() => Cart); }
         }
         public int Quantity
         {
             get { return _quantity; }
-            set { _quantity = value; NotifyOfPropertyChange(() => Quantity); }
+            set { 
+                _quantity = value; 
+                NotifyOfPropertyChange(() => Quantity); 
+                NotifyOfPropertyChange(() => CanAddToCart); }
         }
         public string SubTotal
         {
-            get { return "$0.00"; }
+            get
+            {
+                decimal subTotal = 0;
+
+                if (Cart != null)
+                {
+                    foreach (CartItemModel item in Cart)
+                    {
+                        subTotal += (item.Product.RetailPrice * item.QuantityInCart);
+                    }
+                }
+
+                return subTotal.ToString("C");
+
+            }
         }
         public string Tax
         {
@@ -52,30 +89,6 @@ namespace RetailDesktop.ViewModels
         {
             get { return "$0.00"; }
 
-        }
-        public bool CanAddToCart
-        {
-            get
-            {
-                bool output = false;
-                if (Quantity > 0) //And item selected in products )
-                {
-                    output = true;
-                }
-                return output;
-            }
-        }
-        public bool CanRemoveFromCart
-        {
-            get
-            {
-                bool output = false;
-                if (Quantity > 0) // And item selected from Cart )
-                {
-                    output = true;
-                }
-                return output;
-            }
         }
         public bool CanCheckOut
         {
@@ -90,24 +103,95 @@ namespace RetailDesktop.ViewModels
             }
 
         }
-
-        // Events
+        // functions
+        private async Task LoadProducts()
+        {
+            var products = await _productEndpoint.GetAll();
+            Products = new BindingList<ProductModel>(products);
+        }
+        // Events   
         public void AddToCart()
         {
-            throw new NotImplementedException();
+            CartItemModel cartItem = Cart.FirstOrDefault(item => item.Product.Id == SelectedProduct.Id);
+            if (cartItem != null)
+            {
+                cartItem.QuantityInCart += Quantity;
+                // TODO Fix this vv
+                Cart.Remove(cartItem);
+                Cart.Add(cartItem);
+            } else
+            {
+                Cart.Add(new CartItemModel(SelectedProduct, Quantity));
+
+            }
+            SelectedProduct.QuantityInStock -= Quantity;
+            if (SelectedProduct.QuantityInStock <= 0)
+            {
+                Products.Remove(SelectedProduct);
+                SelectedProduct = Products.FirstOrDefault();
+            }
+            Quantity = 1;
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Cart);
         }
         public void RemoveFromCart()
         {
-            throw new NotImplementedException();
+            ProductModel product = Products.FirstOrDefault(p => p.Id == SelectedRemove.Product.Id);
+            if (product == null)
+            {
+                Products.Add(SelectedRemove.Product);
+                // TODO - SORT
+            }
+            SelectedRemove.Product.QuantityInStock += SelectedRemove.QuantityInCart;
+            Cart.Remove(SelectedRemove);
+            SelectedRemove = Cart.FirstOrDefault();
+            NotifyOfPropertyChange(() => SubTotal);
         }
         public void Checkout()
         {
             throw new NotImplementedException();
         }
 
+        // Listeners
+        public bool CanAddToCart
+        {
+            get
+            {
+                if (SelectedProduct != null)
+                {
+                    int result = 0;
+                    try
+                    {
+                        Int32.TryParse(Quantity.ToString(), out result);
+                        if (result <= SelectedProduct.QuantityInStock && Quantity > 0)
+                        {
+                            return true;
+                        }
+                    } catch (Exception error)
+                    {
+                        Console.WriteLine(error);
+                        return false;
+                    }
+                }
+                return false;
+            }
+        }
+        public bool CanRemoveFromCart
+        {
+            get
+            {
+                if (SelectedRemove != null)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
         protected override async void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
+            Cart = new BindingList<CartItemModel>();
             await LoadProducts();
         }
     }

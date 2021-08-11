@@ -32,11 +32,8 @@
             FontSize="48" Grid.Row="0"
             Grid.RowSpan="3" TextAlignment="Center"/>
         <!-- Items -->
-        <TextBlock 
-            Panel.ZIndex="1"
-            Grid.Row="1" Grid.Column="0" />
         <ListBox 
-            ItemsSource="{Binding Products}" 
+            ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedProduct}"
             x:Name="Products" Grid.Row="1" Grid.Column="0"
             MinHeight="100" MinWidth="200">
             <ListBox.ItemTemplate>
@@ -51,19 +48,22 @@
             Orientation="Vertical" Grid.Column="1" 
             Grid.Row="1" Margin="20">
             <TextBlock Text="Quantity:" />
-            <TextBox x:Name="Quantity" MinWidth="100" Margin="0 10"/>
+            <TextBox x:Name="Quantity" MinWidth="100" Margin="0 10" />
             <Button x:Name="AddToCart" Content="Add to Cart" Margin="0 10" />
             <Button x:Name="RemoveFromCart" Content="Remove from Cart" Margin="0 10" />
         </StackPanel>
 
         <!-- Cart -->
-        <TextBlock 
-            Panel.ZIndex="1" Text="Cart:" 
-            Grid.Row="1" Grid.Column="2" 
-            Width="200"/>
         <ListBox 
+            ItemsSource="{Binding Cart}" SelectedItem="{Binding SelectedRemove}"
             x:Name="Cart" Grid.Row="1" Grid.Column="2"
-            MinHeight="200" MinWidth="150"/>
+            MinHeight="200" MinWidth="150">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayText}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <DockPanel  
              Grid.Row="3" Grid.Column="2">
             <TextBlock 

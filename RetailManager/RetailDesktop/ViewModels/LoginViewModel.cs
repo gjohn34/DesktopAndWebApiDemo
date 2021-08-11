@@ -64,8 +64,6 @@ namespace RetailDesktop.ViewModels
             }
         }
 
-
-
         public bool CanLogIn
         {
             get
