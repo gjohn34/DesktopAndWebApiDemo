@@ -18,5 +18,15 @@ namespace RetailManager.Library.DataAccess
             return sql.LoadData<ProductModel, dynamic>
                 ("dbo.spGetAllProducts", new { }, "RetailManager");
         }
+
+        public static ProductModel GetProductById(int id)
+        {
+            SqlDataAccess sql = new SqlDataAccess();
+
+            // TODO - add overflow to loaddata to accept no p
+            return sql.LoadData<ProductModel, dynamic>
+                ("dbo.spGetProductById", new { id }, "RetailManager").FirstOrDefault();
+
+        }
     }
 }

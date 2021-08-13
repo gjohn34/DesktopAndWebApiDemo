@@ -31,6 +31,7 @@ namespace RetailDesktop
         {
             _container
                 .Instance(_container)
+                .PerRequest<ISaleEndpoint, SaleEndpoint>()
                 .PerRequest<IProductEndpoint, ProductEndpoint>();
 
 

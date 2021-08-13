@@ -14,14 +14,16 @@ namespace RetailManager.Library.Internal.DataAccess
     {
         public string GetConnectionString(string name)
         {
-            return ConfigurationManager.ConnectionStrings[name].ConnectionString;
+            var foo = ConfigurationManager.ConnectionStrings[name];
+            return foo.ConnectionString;
         }
 
         // T and U are generics, making Load/Write reusable by not specifying a type
         // T is the "first" generic, any letter can be used but T is the first, then U i guess?
         public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
         {
-            using (IDbConnection connection = new SqlConnection(GetConnectionString(connectionStringName)))
+            string foo = GetConnectionString(connectionStringName);
+            using (IDbConnection connection = new SqlConnection(foo))
             {
                 List<T> rows = connection.Query<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure).ToList();
                 return rows;

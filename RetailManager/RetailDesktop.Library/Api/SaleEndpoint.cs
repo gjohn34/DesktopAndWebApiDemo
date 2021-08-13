@@ -18,17 +18,19 @@ namespace RetailDesktop.Library.Api
             _apiHelper = apiHelper;
         }
 
-        public async void PostSale(SaleModel sale)
+        public async Task PostSale(SaleModel sale)
         {
-            //HttpContent content;
-            //using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsync("Sale", ""))
-            //{
-            //    if (response.IsSuccessStatusCode)
-            //    {
-            //        throw new NotImplementedException();
-            //    }
-            //}
-            throw new NotImplementedException();
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("Sale", sale))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    //
+                }
+                else
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
         }
     }
 }

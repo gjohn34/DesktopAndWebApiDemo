@@ -24,9 +24,10 @@ namespace RetailDesktop.ViewModels
         readonly IConfigHelper _configHelper;
         
         // Constructors
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint)
         {
             _productEndpoint = productEndpoint;
+            _saleEndpoint = saleEndpoint;
             _configHelper = configHelper;
         }
 
@@ -169,7 +170,7 @@ namespace RetailDesktop.ViewModels
             NotifyOfPropertyChange(() => Cart);
             NotifyOfPropertyChange(() => CanCheckOut);
         }
-        public void CheckOut()
+        public async Task CheckOut()
         {
             SaleModel sale = new SaleModel();
 
@@ -177,9 +178,10 @@ namespace RetailDesktop.ViewModels
             {
                 sale.SaleDetails.Add(new SaleDetailModel(item.Product.Id, item.QuantityInCart));
             }
-            _saleEndpoint.PostSale(sale);
-            // SaleModel 
-            // post to api
+            await _saleEndpoint.PostSale(sale);
+            // update products
+            //await LoadProducts();
+            //Cart = new BindingList<CartItemModel>();
             //throw new NotImplementedException();
         }
 

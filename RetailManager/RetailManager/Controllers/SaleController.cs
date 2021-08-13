@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using RetailManager.Library.DataAccess;
+using RetailManager.Library.Models;
+using RetailManager.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,11 +11,17 @@ using System.Web.Http;
 
 namespace RetailManager.Controllers
 {
+    [Authorize]
     public class SaleController : ApiController
     {
         // POST: api/Sale
-        public void Post([FromBody]string value)
+        [HttpPost]
+        public void Post(SaleModel sale)
         {
+            SaleData.InsertSale(sale, RequestContext.Principal.Identity.GetUserId());
+
+            // if successful,
+            // reduce quantity of each product
         }
     }
 }

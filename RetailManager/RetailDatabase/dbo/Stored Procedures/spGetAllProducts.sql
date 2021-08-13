@@ -7,4 +7,3 @@ BEGIN
 	FROM dbo.Product 
 	order by Name
 END
-RETURN 0

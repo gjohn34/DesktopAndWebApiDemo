@@ -6,6 +6,6 @@ namespace RetailDesktop.Library.Api
 {
     public interface ISaleEndpoint
     {
-        void PostSale(SaleModel sale);
+        Task PostSale(SaleModel sale);
     }
 }

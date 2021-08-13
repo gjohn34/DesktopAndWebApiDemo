@@ -8,4 +8,3 @@ BEGIN
 	from [dbo].[User]
 	WHERE Id = @Id;
 END
-RETURN 0
