@@ -10,18 +10,5 @@ namespace RetailDesktop.Library.Models
     {
         public ProductModel Product { get; set; }
         public int QuantityInCart { get; set; }
-        public string DisplayText
-        {
-            get
-            {
-                return $"{Product.Name} - {QuantityInCart}";
-            }
-        }
-
-        public CartItemModel(ProductModel product, int quantity)
-        {
-            Product = product;
-            QuantityInCart = quantity;
-        }
     }
 }

@@ -1,7 +1,9 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
 using RetailDesktop.Library.Api;
 using RetailDesktop.Library.Helpers;
 using RetailDesktop.Library.Models;
+using RetailDesktop.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,25 +16,28 @@ namespace RetailDesktop.ViewModels
     public class SalesViewModel : Screen
     {
         // Backers
-        private BindingList<ProductModel> _products;
-        private BindingList<CartItemModel> _cart;
+        private BindingList<ProductDisplayModel> _products;
+        private BindingList<CartItemDisplayModel> _cart;
         private int _quantity = 1;
-        private ProductModel _selectedProduct;
-        private CartItemModel _selectedRemove;
+        private ProductDisplayModel _selectedProduct;
+        private CartItemDisplayModel _selectedRemove;
         readonly IProductEndpoint _productEndpoint;
         readonly ISaleEndpoint _saleEndpoint;
         readonly IConfigHelper _configHelper;
+        readonly IMapper _mapper;
         
         // Constructors
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint)
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, 
+            ISaleEndpoint saleEndpoint, IMapper mapper)
         {
             _productEndpoint = productEndpoint;
             _saleEndpoint = saleEndpoint;
             _configHelper = configHelper;
+            _mapper = mapper;
         }
 
         // Props
-        public CartItemModel SelectedRemove
+        public CartItemDisplayModel SelectedRemove
         {
             get { return _selectedRemove; }
             set {
@@ -41,7 +46,7 @@ namespace RetailDesktop.ViewModels
                 NotifyOfPropertyChange(() => CanRemoveFromCart);
                 }
         }
-        public ProductModel SelectedProduct
+        public ProductDisplayModel SelectedProduct
         {
             get { return _selectedProduct; }
             set { 
@@ -52,12 +57,12 @@ namespace RetailDesktop.ViewModels
                 NotifyOfPropertyChange(() => CanAddToCart);
                 }
         }
-        public BindingList<ProductModel> Products
+        public BindingList<ProductDisplayModel> Products
         {
             get { return _products; }
             set { _products = value; NotifyOfPropertyChange(() => Products); }
         }
-        public BindingList<CartItemModel> Cart
+        public BindingList<CartItemDisplayModel> Cart
         {
             get { return _cart; }
             set { _cart = value; }
@@ -92,8 +97,9 @@ namespace RetailDesktop.ViewModels
         // functions
         private async Task LoadProducts()
         {
-            var products = await _productEndpoint.GetAll();
-            Products = new BindingList<ProductModel>(products);
+            var productsList = await _productEndpoint.GetAll();
+            var products = _mapper.Map<List<ProductDisplayModel>>(productsList);
+            Products = new BindingList<ProductDisplayModel>(products);
         }
         private decimal CalculateSubTotal()
         {
@@ -101,7 +107,7 @@ namespace RetailDesktop.ViewModels
 
             if (Cart != null)
             {
-                foreach (CartItemModel item in Cart)
+                foreach (CartItemDisplayModel item in Cart)
                 {
                     subTotal += (item.Product.RetailPrice * item.QuantityInCart);
                 }
@@ -114,7 +120,7 @@ namespace RetailDesktop.ViewModels
             decimal taxRate = _configHelper.GetTaxRate() / 100;
             if (Cart != null)
             {
-                foreach (CartItemModel item in Cart)
+                foreach (CartItemDisplayModel item in Cart)
                 {
                     if (item.Product.IsTaxable)
                     {
@@ -128,16 +134,13 @@ namespace RetailDesktop.ViewModels
         // Events   
         public void AddToCart()
         {
-            CartItemModel cartItem = Cart.FirstOrDefault(item => item.Product.Id == SelectedProduct.Id);
+            CartItemDisplayModel cartItem = Cart.FirstOrDefault(item => item.Product.Id == SelectedProduct.Id);
             if (cartItem != null)
             {
                 cartItem.QuantityInCart += Quantity;
-                // TODO Fix this vv
-                Cart.Remove(cartItem);
-                Cart.Add(cartItem);
             } else
             {
-                Cart.Add(new CartItemModel(SelectedProduct, Quantity));
+                Cart.Add(new CartItemDisplayModel(SelectedProduct, Quantity));
 
             }
             SelectedProduct.QuantityInStock -= Quantity;
@@ -155,7 +158,7 @@ namespace RetailDesktop.ViewModels
         }
         public void RemoveFromCart()
         {
-            ProductModel product = Products.FirstOrDefault(p => p.Id == SelectedRemove.Product.Id);
+            ProductDisplayModel product = Products.FirstOrDefault(p => p.Id == SelectedRemove.Product.Id);
             if (product == null)
             {
                 Products.Add(SelectedRemove.Product);
@@ -174,14 +177,14 @@ namespace RetailDesktop.ViewModels
         {
             SaleModel sale = new SaleModel();
 
-            foreach (CartItemModel item in Cart)
+            foreach (CartItemDisplayModel item in Cart)
             {
                 sale.SaleDetails.Add(new SaleDetailModel(item.Product.Id, item.QuantityInCart));
             }
             await _saleEndpoint.PostSale(sale);
             // update products
             //await LoadProducts();
-            //Cart = new BindingList<CartItemModel>();
+            //Cart = new BindingList<CartItemDisplayModel>();
             //throw new NotImplementedException();
         }
 
@@ -228,7 +231,7 @@ namespace RetailDesktop.ViewModels
         protected override async void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
-            Cart = new BindingList<CartItemModel>();
+            Cart = new BindingList<CartItemDisplayModel>();
             await LoadProducts();
         }
     }

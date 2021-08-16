@@ -11,6 +11,8 @@ using System.Windows;
 using System.Windows.Controls;
 using RetailDesktop.Library.Models;
 using RetailDesktop.Library.Api;
+using AutoMapper;
+using RetailDesktop.Models;
 
 namespace RetailDesktop
 {
@@ -29,6 +31,17 @@ namespace RetailDesktop
 
         protected override void Configure()
         {
+            // What are the models being converted
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ProductModel, ProductDisplayModel>();
+                cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
+            });
+            // Creating the instance
+            var mapper = config.CreateMapper();
+
+            // storing the mapper in the container
+            _container.Instance(mapper);
             _container
                 .Instance(_container)
                 .PerRequest<ISaleEndpoint, SaleEndpoint>()
