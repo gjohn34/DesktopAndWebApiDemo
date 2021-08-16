@@ -73,7 +73,9 @@ namespace RetailDesktop.ViewModels
             set { 
                 _quantity = value; 
                 NotifyOfPropertyChange(() => Quantity); 
-                NotifyOfPropertyChange(() => CanAddToCart); }
+                NotifyOfPropertyChange(() => CanAddToCart);
+                NotifyOfPropertyChange(() => CanRemoveFromCart);
+            }
         }
         public string SubTotal
         {
@@ -164,8 +166,12 @@ namespace RetailDesktop.ViewModels
                 Products.Add(SelectedRemove.Product);
                 // TODO - SORT
             }
-            SelectedRemove.Product.QuantityInStock += SelectedRemove.QuantityInCart;
-            Cart.Remove(SelectedRemove);
+            SelectedRemove.Product.QuantityInStock += (Quantity > SelectedRemove.QuantityInCart ? SelectedRemove.QuantityInCart : Quantity);
+            SelectedRemove.QuantityInCart -= (Quantity > SelectedRemove.QuantityInCart ? SelectedRemove.QuantityInCart : Quantity);
+            if (SelectedRemove.QuantityInCart <= 0)
+            {
+                Cart.Remove(SelectedRemove);
+            }
             SelectedRemove = Cart.FirstOrDefault();
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
@@ -221,11 +227,11 @@ namespace RetailDesktop.ViewModels
         {
             get
             {
-                if (SelectedRemove != null)
+                if (SelectedRemove == null || Quantity <= 0)
                 {
-                    return true;
+                    return false;
                 }
-                return false;
+                return true;
             }
         }
         protected override async void OnViewLoaded(object view)
