@@ -51,8 +51,6 @@ namespace RetailDesktop.ViewModels
         {
             get { return !string.IsNullOrEmpty(ErrorMessage); }
         }
-
-
         public string ErrorMessage
         {
             get { return _errorMessage; }

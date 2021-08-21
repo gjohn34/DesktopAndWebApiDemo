@@ -18,7 +18,7 @@ namespace RetailDesktop.ViewModels
         // Backers
         private BindingList<ProductDisplayModel> _products;
         private BindingList<CartItemDisplayModel> _cart;
-        private int _quantity = 1;
+        private int _quantity = 0;
         private ProductDisplayModel _selectedProduct;
         private CartItemDisplayModel _selectedRemove;
         readonly IProductEndpoint _productEndpoint;
@@ -65,7 +65,12 @@ namespace RetailDesktop.ViewModels
         public BindingList<CartItemDisplayModel> Cart
         {
             get { return _cart; }
-            set { _cart = value; }
+            set { 
+                _cart = value;
+                NotifyOfPropertyChange(() => SubTotal);
+                NotifyOfPropertyChange(() => Tax);
+                NotifyOfPropertyChange(() => Total);
+            }
         }
         public int Quantity
         {
@@ -102,6 +107,7 @@ namespace RetailDesktop.ViewModels
             var productsList = await _productEndpoint.GetAll();
             var products = _mapper.Map<List<ProductDisplayModel>>(productsList);
             Products = new BindingList<ProductDisplayModel>(products);
+            NotifyOfPropertyChange(() => Products);
         }
         private decimal CalculateSubTotal()
         {
@@ -188,6 +194,9 @@ namespace RetailDesktop.ViewModels
                 sale.SaleDetails.Add(new SaleDetailModel(item.Product.Id, item.QuantityInCart));
             }
             await _saleEndpoint.PostSale(sale);
+            Cart = new BindingList<CartItemDisplayModel>();
+            await LoadProducts();
+            NotifyOfPropertyChange(() => Cart);
             // update products
             //await LoadProducts();
             //Cart = new BindingList<CartItemDisplayModel>();
