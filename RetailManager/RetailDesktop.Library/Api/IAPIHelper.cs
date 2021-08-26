@@ -8,6 +8,7 @@ namespace RetailDesktop.Library.Helpers
     {
         Task<AuthenticatedUser> Authenticate(string username, string password);
         Task GetLoggedInUserInfo(string token);
+        void LogOffUser();
         HttpClient ApiClient { get; }
     }
 }
