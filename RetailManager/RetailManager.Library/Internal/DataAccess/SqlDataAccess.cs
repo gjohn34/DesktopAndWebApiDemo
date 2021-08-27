@@ -41,6 +41,7 @@ namespace RetailManager.Library.Internal.DataAccess
 
         private IDbConnection _connection;
         private IDbTransaction _transaction;
+        private bool isClosed = false;
 
         public void StartTransaction(string connectionStringName) 
         {
@@ -48,23 +49,17 @@ namespace RetailManager.Library.Internal.DataAccess
             _connection = new SqlConnection(GetConnectionString(connectionStringName));
             _connection.Open();
             _transaction = _connection.BeginTransaction();
+            isClosed = false;
         }
 
         public void WriteDataInTransaction<T>(string storedProcedure, T parameters)
         {
-            //var dataTwo = _connection.Execute("INSERT into dbo.Product (Name, Description, RetailPrice, QuantityInStock, IsTaxable) VALUES('p5', 'd5', 500, 5, 1)", transaction: _transaction);
-            //var foo = parameters.SaleDate.GetType();
-            //var dataTwo = _connection.Execute($"INSERT into dbo.Sale (UserId, SaleDate, SubTotal, Tax, Total) VALUES('eaa2bb2f-f260-4536-9910-7b631492165f', {parameters.SaleDate}, 300, 20, 320)", transaction: _transaction);
-
-            //// WHY DOESN'T THIS WORK!!!
-            var data = _connection.Execute(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction);
-            return;
+            _connection.Execute(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction);
         }
 
         public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
         {
-            List<T> rows = _connection.Query<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction).ToList();
-            return rows;
+            return _connection.Query<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction).ToList();
         }
 
         public void CommitTransaction()
@@ -72,6 +67,7 @@ namespace RetailManager.Library.Internal.DataAccess
             // if sucessful, saves transaction
             _transaction.Commit();
             _connection.Close();
+            isClosed = true;
         }
 
         public void RollbackTransaction()
@@ -79,12 +75,23 @@ namespace RetailManager.Library.Internal.DataAccess
             // rollback on fail
             _transaction?.Rollback();
             _connection?.Close();
+            isClosed = true;
+
         }
 
         public void Dispose()
         {
             // commit or rollback
-            CommitTransaction();
+            if (!isClosed)
+            {
+                try
+                {
+                    CommitTransaction();
+                } catch
+                {
+                    // TODO - log out
+                }
+            }
             _transaction = null;
             _connection = null;
         }
