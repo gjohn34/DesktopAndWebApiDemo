@@ -12,5 +12,5 @@ BEGIN
 	(SaleId, ProductId, Quantity, PurchasePrice, Tax)
 	VALUES (@SaleId, @ProductId, @Quantity, @PurchasePrice, @Tax)
 
-	select @Id = @@Identity;
+	select @Id = SCOPE_IDENTITY();
 END

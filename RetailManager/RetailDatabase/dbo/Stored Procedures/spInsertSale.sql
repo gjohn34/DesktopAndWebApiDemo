@@ -8,10 +8,10 @@
 AS
 BEGIN
 	set nocount on;
+
 	INSERT into dbo.Sale
 	(UserId, SaleDate, SubTotal, Tax, Total)
-	VALUES (@UserId, @SaleDate, @SubTotal, @Tax, @Total)
+	VALUES (@UserId, @SaleDate, @SubTotal, @Tax, @Total);
 
-	select @Id = @@Identity;
-
+	select @Id = SCOPE_IDENTITY();
 END

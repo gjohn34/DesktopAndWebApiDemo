@@ -17,6 +17,7 @@ namespace RetailManager.Library.DataAccess
             // Anonymous object, no declared Type
             var p = new { Id };
 
+            // LOGGING IN WRONG THROWS ERROR
             return sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", p, "RetailManager").First();
                 
         }

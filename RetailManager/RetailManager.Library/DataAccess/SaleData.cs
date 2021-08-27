@@ -14,7 +14,10 @@ namespace RetailManager.Library.DataAccess
     {
         public static void InsertSale(SaleModel sale, string userId)
         {
+            // sale is from the client
+            // details are what is being written to db
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
+            // converting each sale detail into a detaildb
             foreach (SaleDetailModel saleDetail in sale.SaleDetails)
             {
                 SaleDetailDBModel detail = new SaleDetailDBModel(saleDetail.ProductId, saleDetail.Quantity);
@@ -36,27 +39,44 @@ namespace RetailManager.Library.DataAccess
 
             }
 
+            // creating new sale that has current date set automatically
             SaleDBModel newSale = new SaleDBModel
             {
                 SubTotal = details.Sum(x => x.PurchasePrice),
                 Tax = details.Sum(x => x.Tax),
-                UserId = userId,
+                UserId = userId
             };
+
             newSale.Total = newSale.SubTotal + newSale.Tax;
 
 
-            // write the sale first
-            SqlDataAccess sql = new SqlDataAccess();
+            using(SqlDataAccess sql = new SqlDataAccess())
+            {   
+                try
+                {
+                    sql.StartTransaction("RetailManager");
+                
+                    // write the sale first
+                    sql.WriteDataInTransaction("dbo.spInsertSale", newSale);
 
-            sql.WriteData("dbo.spInsertSale", newSale, "RetailManager");
+                    // find the sale 
+                    // TODO - find a way to get it on the write
+                    newSale.Id = sql.LoadDataInTransaction<int, dynamic>("spSaleLookup", new { newSale.UserId, newSale.SaleDate }).FirstOrDefault();
 
-            int id = 2;
-
-            foreach (SaleDetailDBModel detailItem in details)
-            {
-                detailItem.SaleId = id;
-                sql.WriteData("dbo.spInsertSaleDetail", detailItem, "RetailManager");
+                    // Save each saleItem
+                    foreach (SaleDetailDBModel detailItem in details)
+                    {
+                        detailItem.SaleId = newSale.Id;
+                        sql.WriteDataInTransaction("dbo.spInsertSaleDetail", detailItem);
+                    }
+                } catch
+                {
+                    sql.RollbackTransaction();
+                    throw;
+                }
             }
+
+
             // if successful, get id
 
 
