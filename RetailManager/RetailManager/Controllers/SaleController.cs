@@ -19,9 +19,13 @@ namespace RetailManager.Controllers
         public void Post(SaleModel sale)
         {
             SaleData.InsertSale(sale, RequestContext.Principal.Identity.GetUserId());
+        }
 
-            // if successful,
-            // reduce quantity of each product
+        [HttpGet]
+        // TODO - Authorized by role
+        public List<SaleReportModel> GetSalesReport()
+        {
+            return SaleData.GetSaleReport();
         }
     }
 }
