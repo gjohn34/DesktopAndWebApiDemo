@@ -16,12 +16,14 @@ namespace RetailManager.Controllers
     {
         // POST: api/Sale
         [HttpPost]
+        [Authorize(Roles = "Cashier")]
         public void Post(SaleModel sale)
         {
             SaleData.InsertSale(sale, RequestContext.Principal.Identity.GetUserId());
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
         // TODO - Authorized by role
         public List<SaleReportModel> GetSalesReport()
         {

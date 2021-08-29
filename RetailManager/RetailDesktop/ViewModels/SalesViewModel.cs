@@ -7,9 +7,11 @@ using RetailDesktop.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RetailDesktop.ViewModels
 {
@@ -25,15 +27,19 @@ namespace RetailDesktop.ViewModels
         readonly ISaleEndpoint _saleEndpoint;
         readonly IConfigHelper _configHelper;
         readonly IMapper _mapper;
+        private readonly StatusInfoViewModel _status;
+        private readonly IWindowManager _window;
         
         // Constructors
         public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, 
-            ISaleEndpoint saleEndpoint, IMapper mapper)
+            ISaleEndpoint saleEndpoint, IMapper mapper, StatusInfoViewModel status, IWindowManager window)
         {
             _productEndpoint = productEndpoint;
             _saleEndpoint = saleEndpoint;
             _configHelper = configHelper;
             _mapper = mapper;
+            _status = status;
+            _window = window;
         }
 
         // Props
@@ -196,6 +202,7 @@ namespace RetailDesktop.ViewModels
             await _saleEndpoint.PostSale(sale);
             Cart = new BindingList<CartItemDisplayModel>();
             await LoadProducts();
+
             NotifyOfPropertyChange(() => Cart);
             // update products
             //await LoadProducts();
@@ -247,7 +254,25 @@ namespace RetailDesktop.ViewModels
         {
             base.OnViewLoaded(view);
             Cart = new BindingList<CartItemDisplayModel>();
-            await LoadProducts();
+            try
+            {
+                await LoadProducts();
+            }
+            catch (Exception ex)
+            {
+                dynamic settings = new ExpandoObject();
+                settings.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                settings.ResizeMode = ResizeMode.NoResize;
+                settings.Title = "An error has occurred";
+
+                _status.UpdateMessage("Unauthorized", "Cashiers Only");
+
+                await TryCloseAsync();
+                // open up dashboard page
+                
+                await _window.ShowDialogAsync(_status, null, settings);
+
+            }
         }
     }
 }

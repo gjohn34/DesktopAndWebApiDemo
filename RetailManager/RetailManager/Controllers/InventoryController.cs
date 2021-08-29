@@ -9,9 +9,10 @@ using System.Web.Http;
 
 namespace RetailManager.Controllers
 {
-    //[Authorize]
+    [Authorize(Roles = "Manager,Admin")]
     public class InventoryController : ApiController
     {
+        [HttpGet]
         public List<InventoryModel> GetInventoryData()
         {
             InventoryData data = new InventoryData();
