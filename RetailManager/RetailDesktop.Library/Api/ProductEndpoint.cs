@@ -22,8 +22,7 @@ namespace RetailDesktop.Library.Api
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadAsAsync<List<ProductModel>>();
-                    return result;
+                    return await response.Content.ReadAsAsync<List<ProductModel>>();
                     // TODO - Mapper
                 }
                 else

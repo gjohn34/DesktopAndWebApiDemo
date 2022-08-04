@@ -9,22 +9,22 @@ using System.Threading.Tasks;
 
 namespace RetailDesktop.Library.Api
 {
-    public class SaleEndpoint : ISaleEndpoint
+    public class UserEndpoint : IUserEndpoint
     {
         private readonly IAPIHelper _apiHelper;
 
-        public SaleEndpoint(IAPIHelper apiHelper)
+        public UserEndpoint(IAPIHelper apiHelper)
         {
             _apiHelper = apiHelper;
         }
 
-        public async Task PostSale(SaleModel sale)
+        public async Task<List<UserModel>> GetAll()
         {
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("Sale", sale))
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("Users"))
             {
                 if (response.IsSuccessStatusCode)
                 {
-
+                    return await response.Content.ReadAsAsync<List<UserModel>>();
                 }
                 else
                 {
@@ -32,5 +32,7 @@ namespace RetailDesktop.Library.Api
                 }
             }
         }
+
+
     }
 }

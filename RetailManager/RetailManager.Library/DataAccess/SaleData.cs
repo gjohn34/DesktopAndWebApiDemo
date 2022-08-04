@@ -68,6 +68,8 @@ namespace RetailManager.Library.DataAccess
                     {
                         detailItem.SaleId = newSale.Id;
                         sql.WriteDataInTransaction("dbo.spInsertSaleDetail", detailItem);
+                        var p = new { Id = detailItem.ProductId, Quantity = detailItem.Quantity };
+                        sql.WriteDataInTransaction("dbo.spUpdateProductQuantity", p);
                     }
                 } catch
                 {

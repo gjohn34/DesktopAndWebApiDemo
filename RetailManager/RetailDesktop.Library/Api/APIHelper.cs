@@ -62,6 +62,10 @@ namespace RetailDesktop.Library.Helpers
         }
         public async Task GetLoggedInUserInfo(string token)
         {
+            if (_apiClient.DefaultRequestHeaders.Authorization != null)
+            {
+                _apiClient.DefaultRequestHeaders.Clear();
+            }
             _apiClient.DefaultRequestHeaders.Accept.Clear();
             _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             _apiClient.DefaultRequestHeaders.Accept.Clear();
